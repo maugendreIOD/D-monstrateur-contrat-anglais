@@ -23,7 +23,7 @@ client = OpenAI(
 # Fonction d'analyse de contrat
 def analyze_contract(contract_text):
     try:
-        prompt = f"Fait une synthèse du document suivant en faisant une liste des points clés à retenir :\n\n{contract_text}\n"
+        prompt = f"Perform the analysis of the contract and make a list of the key elements as well as potential risks in the contract (make sure to outline if there is no price revision clause) :\n\n{contract_text}\n"
         response = client.chat.completions.create(
             messages=[
                    {
@@ -41,7 +41,7 @@ def analyze_contract(contract_text):
 # Fonction pour interagir avec ChatGPT
 def chat_with_gpt(question, contract_text):
     try:
-        prompt = f"En considérant le contrat suivant: {contract_text}\n{question}"
+        prompt = f"Considering the following contract: {contract_text}\n{question}"
         response =client.chat.completions.create(
     messages=[
         {
@@ -62,11 +62,11 @@ st.set_page_config(layout="wide", page_title="Analyse de Contrat avec ChatGPT", 
 logo=Image.open("Logo_Iod_solutions_Horizontal_Logo.png")
 
 st.image(logo, width=200)
-st.title('Analyseur de document augmenté par IA générative')
+st.title('Contract analysis augmented analyzer')
 
 disclaimer = """
 <span style="font-size: small;">
-Si vous souhaitez utiliser ce démonstrateur ou obtenir plus d'informations, merci de prendre contact à contact@iod-solutions.fr
+To use this tool or get more information, please contact contact@iod-solutions.fr
 </span>
 """
 st.sidebar.markdown(disclaimer, unsafe_allow_html=True)
@@ -85,16 +85,16 @@ def submit():
 
 st.sidebar.text_input('Mot de passe', type='password', key='password', on_change=submit)
 if st.session_state.text == IOD_key:
-    etat("Vous êtes connecté")
+    etat("Connected")
 else:
-    etat("Vous n'êtes pas connecté")
+    etat("Not connected")
 
-st.sidebar.header("Uploader le fichier")
+st.sidebar.header("Upload the file")
 # Uploader le fichier:
 uploaded_file = st.sidebar.file_uploader("",type=['txt', 'docx', 'pdf'], key="fileUploader")
 
-st.sidebar.header("Sélection de l'analyse")
-page_options = ["Synthèse document", "FAQ document"]
+st.sidebar.header("Choose the option")
+page_options = ["Contract analysis", "Questions"]
 # Use st.radio to allow selecting only one option
 selected_page = st.sidebar.radio("",page_options)
 
@@ -124,13 +124,13 @@ if st.session_state.text == IOD_key:
         else:
             contract_text = uploaded_file.getvalue().decode("utf-8")
 
-        if selected_page == "Synthèse document":
+        if selected_page == "Contract analysis":
             if st.button('Analyser le contrat', key="analyzeButton"):
                 result = analyze_contract(contract_text)
-                st.text_area("Résultat de l'analyse", value=result, height=500, key="resultTextArea")
+                st.text_area("Analysis outcome", value=result, height=500, key="resultTextArea")
 
-        elif selected_page == "FAQ document":
-            user_question = st.text_input("Posez votre question", "")
+        elif selected_page == "Questions":
+            user_question = st.text_input("Ask your question", "")
             if user_question:
                 answer = chat_with_gpt(user_question, contract_text)
                 st.write(f"Réponse : {answer}")
